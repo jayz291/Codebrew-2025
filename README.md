@@ -7,6 +7,4 @@ FlashyLingua is a multi-language flashcard app built with Python and Tkinter. Th
 https://youtu.be/tFESpVOyECY
 
 # Inspos
-Anki
-Quizlet
-Python 100-Days-of-Coding Bootcamp
+Anki, Quizlet, Python 100-Days-of-Coding Bootcamp
