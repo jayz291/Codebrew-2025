@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, PhotoImage, Toplevel, Canvas
+from tkinter import Tk, Label, Button, PhotoImage, Toplevel, Canvas, Frame
 import pandas as pd
 import random
 import pygame
@@ -13,8 +13,10 @@ if platform.system() == "Windows":
     window.attributes("-fullscreen", True)
     window.bind("<Escape>", lambda e: window.attributes("-fullscreen", False))
 elif platform.system() == "Darwin":
-    window.attributes("-zoomed", True)
-    window.bind("<Escape>", lambda e: window.attributes("-zoomed", False))
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    window.geometry(f"{screen_width}x{screen_height}")
+    window.bind("<Escape>", lambda e: window.geometry("1200x800"))
 
 LIGHT_GREEN_BACKGROUND_COLOUR = "#B1DDC6"
 GREEN_COLOUR = "#88B04B"
@@ -85,13 +87,19 @@ def setup_flashcard_ui(language, word_dict, remaining_words):
     canvas_width = SCREEN_WIDTH - 400
     optimal_centering_width = canvas_width / 2
 
-    canvas = Canvas(window, width=canvas_width, height=canvas_height, highlightthickness=0, bg=LIGHT_GREEN_BACKGROUND_COLOUR)
+    card_frame = Frame(window, bg=LIGHT_GREEN_BACKGROUND_COLOUR)
+    card_frame.grid(row=1, column=1, pady=20)
+
+    canvas = Canvas(card_frame, width=canvas_width, height=canvas_height, highlightthickness=0, bg=LIGHT_GREEN_BACKGROUND_COLOUR)
     canvas_image = canvas.create_image(optimal_centering_width, canvas_height / 2, image=card_front_img)
+
     title_text = canvas.create_text(
         optimal_centering_width, 150, text=language, font=("Arial", 30, "italic"), fill=DARK_GREEN_COLOUR,
     )
     reminder_text_label = Label(
-        window, text="Left-click on the flashcard to show translation!", font=("Arial", 50, "bold"), fg=DARK_GREEN_COLOUR, bg=LIGHT_GREEN_BACKGROUND_COLOUR
+        window, text="Left-click on the flashcard to show translation!",
+        font=("Arial", 50, "bold"), fg=DARK_GREEN_COLOUR,
+        bg=LIGHT_GREEN_BACKGROUND_COLOUR
     )
     reminder_text_label.grid(row=0, column=1)
 
@@ -99,17 +107,25 @@ def setup_flashcard_ui(language, word_dict, remaining_words):
     counter_text = canvas.create_text(
         optimal_centering_width, 450, text="Words reviewed: 0/20", font=("Arial", 20, "bold"), fill=DARK_GREEN_COLOUR,
     )
-    canvas.grid(column=1, row=1, columnspan=1, pady=20)
 
-    wrong_button = Button(window, image=wrong_img, highlightthickness=0)
+
+    wrong_button = Button(card_frame, image=wrong_img, highlightthickness=0)
+    right_button = Button(card_frame, image=right_img, highlightthickness=0)
+
     wrong_button.grid(column=0, row=2)
-    right_button = Button(window, image=right_img, highlightthickness=0)
     right_button.grid(column=2, row=2)
+    canvas.grid(row=0, column=1)
+
     restart_button = Button(
-        window, text="Back to Start", font=("Arial", 18), fg=YELLOW_COLOUR, bg=DARK_GREEN_COLOUR, command=start_menu
+        card_frame, text="Back to Start", font=("Arial", 18), fg=YELLOW_COLOUR, bg=DARK_GREEN_COLOUR, command=start_menu
     )
     restart_button.grid(column=1, row=2, pady=30)
-    escape_label = Label(window, text="Press 'ESC' on keyboard to toggle out of full-screen mode", font=("Arial", 30), fg=GREEN_COLOUR, bg=LIGHT_GREEN_BACKGROUND_COLOUR)
+    escape_label = Label(
+        card_frame, text="Press 'ESC' on keyboard to toggle out of full-screen mode",
+        font=("Arial", 30),
+        fg=GREEN_COLOUR,
+        bg=LIGHT_GREEN_BACKGROUND_COLOUR
+    )
     escape_label.grid(column=1, row=3, pady=70)
 
     canvas.card_front_img = card_front_img
