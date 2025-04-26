@@ -1,4 +1,4 @@
-from tkinter import *
+from tkinter import Tk, Label, Button, PhotoImage, Toplevel, Canvas
 import pandas as pd
 import random
 import pygame
