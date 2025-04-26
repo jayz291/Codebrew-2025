@@ -14,11 +14,17 @@ def start_menu():
     for widget in window.winfo_children():
         widget.destroy()
 
-    Label(window, text="Choose a Language", font=("Arial", 25, "bold"), bg="#B1DDC6").pack(pady=20)
+    Label(
+        window, text="Choose a Language", font=("Arial", 25, "bold"), bg="#B1DDC6"
+    ).pack(pady=20)
 
     for language in ["French", "Latin", "Chinese"]:
-        Button(window, text=language, font=("Arial", 18),
-               command=lambda lang=language: load_vocabulary(lang)).pack(pady=10)
+        Button(
+            window,
+            text=language,
+            font=("Arial", 18),
+            command=lambda lang=language: load_vocabulary(lang),
+        ).pack(pady=10)
 
 
 def load_vocabulary(language):
@@ -31,7 +37,7 @@ def load_vocabulary(language):
     file_path = language_files.get(language)
     words = pd.read_csv(file_path, encoding="utf-8")
 
-    word_dict = {str(row.iloc[0]): str(row.iloc[1]) for _, row in words.iterrows()}
+    word_dict = {row.iloc[0]: row.iloc[1] for _, row in words.iterrows()}
     remaining_words = list(word_dict.keys())
 
     # Move to main flashcard screen
@@ -47,7 +53,7 @@ def setup_flashcard_ui(language, word_dict, remaining_words):
         "showing_front": True,
         "random_word": None,
         "session_counter": 0,
-        "answering": False
+        "answering": False,
     }
 
     card_front_img = PhotoImage(file="images/card_front.png")
@@ -57,16 +63,22 @@ def setup_flashcard_ui(language, word_dict, remaining_words):
 
     canvas = Canvas(window, width=820, height=550, highlightthickness=0, bg="#B1DDC6")
     canvas_image = canvas.create_image(410, 275, image=card_front_img)
-    title_text = canvas.create_text(410, 150, text=language, font=("Arial", 30, "italic"))
+    title_text = canvas.create_text(
+        410, 150, text=language, font=("Arial", 30, "italic")
+    )
     word_text = canvas.create_text(410, 275, text="", font=("Arial", 50, "bold"))
-    counter_text = canvas.create_text(410, 450, text="Words reviewed: 0/20", font=("Arial", 20, "bold"))
+    counter_text = canvas.create_text(
+        410, 450, text="Words reviewed: 0/20", font=("Arial", 20, "bold")
+    )
     canvas.grid(column=0, row=0, columnspan=2)
 
     wrong_button = Button(window, image=wrong_img, highlightthickness=0)
     wrong_button.grid(column=0, row=1)
     right_button = Button(window, image=right_img, highlightthickness=0)
     right_button.grid(column=1, row=1)
-    restart_button = Button(window, text="Back to Start", font=("Arial", 18), command=start_menu)
+    restart_button = Button(
+        window, text="Back to Start", font=("Arial", 18), command=start_menu
+    )
     restart_button.grid(column=0, row=2, columnspan=2, pady=20)
 
     canvas.card_front_img = card_front_img
@@ -74,12 +86,34 @@ def setup_flashcard_ui(language, word_dict, remaining_words):
     wrong_button.image = wrong_img
     right_button.image = right_img
 
-    new_session(language, word_dict, remaining_words, canvas, canvas_image, title_text,
-                      word_text, counter_text, wrong_button, right_button, state)
+    new_session(
+        language,
+        word_dict,
+        remaining_words,
+        canvas,
+        canvas_image,
+        title_text,
+        word_text,
+        counter_text,
+        wrong_button,
+        right_button,
+        state,
+    )
 
 
-def new_session(language, word_dict, remaining_words, canvas, canvas_image, title_text,
-                      word_text, counter_text, wrong_button, right_button, state):
+def new_session(
+    language,
+    word_dict,
+    remaining_words,
+    canvas,
+    canvas_image,
+    title_text,
+    word_text,
+    counter_text,
+    wrong_button,
+    right_button,
+    state,
+):
     session_size = 20
     known_words = {}
     unknown_words = {}
@@ -89,12 +123,17 @@ def new_session(language, word_dict, remaining_words, canvas, canvas_image, titl
 
     # Get batch of words for this session
     if remaining_words:
-        session_words = random.sample(remaining_words, min(session_size, len(remaining_words)))
+        session_words = random.sample(
+            remaining_words, min(session_size, len(remaining_words))
+        )
         for word in session_words:
             remaining_words.remove(word)
 
         def update_counter():
-            canvas.itemconfig(counter_text, text=f"Words reviewed: {state['session_counter']}/{session_size}")
+            canvas.itemconfig(
+                counter_text,
+                text=f"Words reviewed: {state['session_counter']}/{session_size}",
+            )
 
         def pick_random_word():
             if session_words:
@@ -109,9 +148,21 @@ def new_session(language, word_dict, remaining_words, canvas, canvas_image, titl
 
                 return True
             else:
-                display_session_review(known_words, unknown_words, language, word_dict,
-                                       remaining_words, canvas, canvas_image, title_text, word_text,
-                                       counter_text, wrong_button, right_button, state)
+                display_session_review(
+                    known_words,
+                    unknown_words,
+                    language,
+                    word_dict,
+                    remaining_words,
+                    canvas,
+                    canvas_image,
+                    title_text,
+                    word_text,
+                    counter_text,
+                    wrong_button,
+                    right_button,
+                    state,
+                )
                 return False
 
         def mark_word(correct):
@@ -135,7 +186,9 @@ def new_session(language, word_dict, remaining_words, canvas, canvas_image, titl
             else:
                 canvas.itemconfig(canvas_image, image=canvas.card_back_img)
                 canvas.itemconfig(title_text, text="Translation", fill="white")
-                canvas.itemconfig(word_text, text=word_dict[state["random_word"]], fill="white")
+                canvas.itemconfig(
+                    word_text, text=word_dict[state["random_word"]], fill="white"
+                )
 
         canvas.bind("<Button-1>", flip_card)
         wrong_button.config(command=lambda: mark_word(False))
@@ -146,9 +199,21 @@ def new_session(language, word_dict, remaining_words, canvas, canvas_image, titl
         ending_screen()
 
 
-def display_session_review(known_words, unknown_words, language, word_dict,
-                           remaining_words, canvas, canvas_image, title_text, word_text,
-                           counter_text, wrong_button, right_button, state):
+def display_session_review(
+    known_words,
+    unknown_words,
+    language,
+    word_dict,
+    remaining_words,
+    canvas,
+    canvas_image,
+    title_text,
+    word_text,
+    counter_text,
+    wrong_button,
+    right_button,
+    state,
+):
     pygame.mixer.Sound("sounds/review.mp3").play()
 
     # Create review window
@@ -156,21 +221,56 @@ def display_session_review(known_words, unknown_words, language, word_dict,
     review_window.title("Session Review")
     review_window.config(bg="#B1DDC6")
 
-    Label(review_window, text="Session Complete!", font=("Arial", 25, "bold"), bg="#B1DDC6").pack(pady=10)
+    Label(
+        review_window,
+        text="Session Complete!",
+        font=("Arial", 25, "bold"),
+        bg="#B1DDC6",
+    ).pack(pady=10)
 
-    Label(review_window, text="Words You Knew (✓):", font=("Arial", 18), bg="#B1DDC6").pack(pady=5)
+    Label(
+        review_window, text="Words You Knew (✓):", font=("Arial", 18), bg="#B1DDC6"
+    ).pack(pady=5)
     for front, back in known_words.items():
-        Label(review_window, text=f"✔ {front} → {back}", font=("Arial", 14, "bold"), bg="#B1DDC6").pack()
+        Label(
+            review_window,
+            text=f"✔ {front} → {back}",
+            font=("Arial", 14, "bold"),
+            bg="#B1DDC6",
+        ).pack()
 
-    Label(review_window, text="Words You Missed (✗):", font=("Arial", 18), bg="#B1DDC6").pack(pady=5)
+    Label(
+        review_window, text="Words You Missed (✗):", font=("Arial", 18), bg="#B1DDC6"
+    ).pack(pady=5)
     for front, back in unknown_words.items():
-        Label(review_window, text=f"✖ {front} → {back}", font=("Arial", 14, "bold"), bg="#B1DDC6").pack()
+        Label(
+            review_window,
+            text=f"✖ {front} → {back}",
+            font=("Arial", 14, "bold"),
+            bg="#B1DDC6",
+        ).pack()
 
-    Button(review_window, text="Next Session", font=("Arial", 18),
-           command=lambda: [review_window.destroy(),
-                            new_session(language, word_dict, remaining_words, canvas, canvas_image,
-                                              title_text, word_text, counter_text,
-                                              wrong_button, right_button, state)]).pack(pady=20)
+    Button(
+        review_window,
+        text="Next Session",
+        font=("Arial", 18),
+        command=lambda: [
+            review_window.destroy(),
+            new_session(
+                language,
+                word_dict,
+                remaining_words,
+                canvas,
+                canvas_image,
+                title_text,
+                word_text,
+                counter_text,
+                wrong_button,
+                right_button,
+                state,
+            ),
+        ],
+    ).pack(pady=20)
 
 
 def ending_screen():
@@ -179,9 +279,15 @@ def ending_screen():
     for widget in window.winfo_children():
         widget.destroy()
 
-    Label(window, text="🎉 Congratulations! 🎉", font=("Arial", 40, "bold"), bg="#B1DDC6").pack(pady=20)
-    Label(window, text="You've completed all words!", font=("Arial", 25), bg="#B1DDC6").pack(pady=10)
-    Button(window, text="Back to Start", font=("Arial", 18), command=start_menu).pack(pady=20)
+    Label(
+        window, text="🎉 Congratulations! 🎉", font=("Arial", 40, "bold"), bg="#B1DDC6"
+    ).pack(pady=20)
+    Label(
+        window, text="You've completed all words!", font=("Arial", 25), bg="#B1DDC6"
+    ).pack(pady=10)
+    Button(window, text="Back to Start", font=("Arial", 18), command=start_menu).pack(
+        pady=20
+    )
 
 
 start_menu()
