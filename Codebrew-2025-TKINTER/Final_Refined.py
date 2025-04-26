@@ -2,21 +2,29 @@ from tkinter import Tk, Label, Button, PhotoImage, Toplevel, Canvas
 import pandas as pd
 import random
 import pygame
+import platform
+print("Running on:", platform.system())
 
 pygame.mixer.init()
 window = Tk()
 window.title("Flashy")
 # default view is fullscreen, press 'ESC' to escape
-window.attributes("-fullscreen", True)
-window.bind("<Escape>", lambda e: window.attributes("-fullscreen", False))
+if platform.system() == "Windows":
+    window.attributes("-fullscreen", True)
+    window.bind("<Escape>", lambda e: window.attributes("-fullscreen", False))
+elif platform.system() == "Darwin":
+    window.attributes("-zoomed", True)
+    window.bind("<Escape>", lambda e: window.attributes("-zoomed", False))
+
 LIGHT_GREEN_BACKGROUND_COLOUR = "#B1DDC6"
 GREEN_COLOUR = "#88B04B"
 DARK_GREEN_COLOUR = "#005a00"
 YELLOW_COLOUR = "#FFFF00"
 window.config(padx=75, pady=75, bg=LIGHT_GREEN_BACKGROUND_COLOUR)
+
+window.update_idletasks()  # Ensures window has appeared on screen
 SCREEN_WIDTH = window.winfo_screenwidth()
 SCREEN_HEIGHT = window.winfo_screenheight()
-
 
 def start_menu():
     # Clear any existing widgets and create a fresh menu
